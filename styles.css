@@ -66,6 +66,7 @@ nav a:hover {
   cursor: pointer;
   margin-top: 1.5rem;
   transition: background-color 0.3s ease;
+  width: 100%; /* Make button full width */
 }
 
 .btn:hover {
@@ -107,5 +108,63 @@ nav a:hover {
 
 .bottom-nav a:hover {
   color: #ffffff;
+}
+
+.logincon {
+  background-color: #0f0f0f;
+  width: 300px;
+  height: 400px; 
+  border-radius: 20px;
+  border-color:#00ffcc;
+  border-style: solid;
+  border-width: 5px;
+  padding: 2rem; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+}
+
+.form-group {
+  margin-bottom: 1.5rem; 
+  text-align: left;
+}
+
+.form-group label {
+  color:#00ffcc ; 
+  font-weight: 600;
+  display: block; 
+  margin-bottom: 0.5rem; 
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem; 
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; 
+  font-size: 1rem;
+}
+
+.form .btn {
+  margin-top: 2rem; 
+
+}
+
+.signup-text {
+    margin-top: 2rem; 
+    color: #bbbbbb; 
+}
+
+.signup-text a {
+    color: #58a6ff; 
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signup-text a:hover {
+    text-decoration: underline;
+}
+.hero h1{
+    color:#00ffcc;
 }
 

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - Stark Virtual Market</title>
   <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -13,18 +14,20 @@
 
   <section class="hero">
     <h1>Login to your Account</h1>
-    <form style="max-width: 400px; margin: auto;">
-      <div style="margin-bottom: 1rem;">
-        <label>Email</label><br>
-        <input type="email" required style="width: 100%; padding: 0.5rem;" />
-      </div>
-      <div style="margin-bottom: 1rem;">
-        <label>Password</label><br>
-        <input type="password" required style="width: 100%; padding: 0.5rem;" />
-      </div>
-      <button class="btn" type="submit">Login</button>
-    </form>
-    <p style="margin-top: 1rem;">Don't have an account? <a href="signup.html" style="color: #58a6ff;">Sign up</a></p>
+    <div class="logincon">
+      <form class="form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required />
+        </div>
+        <button class="btn" type="submit">Login</button>
+      </form>
+    </div>
+    <p class="signup-text">Don't have an account? <a href="signup.html">Sign up</a></p>
   </section>
 </body>
 </html>
