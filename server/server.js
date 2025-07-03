@@ -21,12 +21,15 @@ app.post('/signin', async (req, res) => {
 
         if (!myuser) {
             myuser = await User.create({ name, email });
+            console.log(myuser)
+            const token = get_token(myuser);
+            res.status(200).cookie('token', token).json({ message: "User verified",name});
         }
-        console.log(myuser)
-        const token = get_token(myuser);
-        res.status(200)
-  .cookie('token', token)
-  .json({ message: "User verified" });
+        else{
+            console.log(myuser)
+            const token = get_token(myuser);
+            res.status(200).cookie('token', token).json({ message: "User verified",name:myuser.name});
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });

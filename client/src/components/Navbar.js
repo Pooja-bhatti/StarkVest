@@ -1,19 +1,14 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 
 export const Navbar = () => {
-  const {
-    loginWithRedirect,
-    logout,
-    user,
-    isAuthenticated,
-    isLoading,
-  } = useAuth0();
-
+  const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Minimal user display name logic
   const getDisplayName = () => {
     if (!user) return '';
     const isSocial = user["https://your-app.com/isSocial"];
@@ -21,60 +16,87 @@ export const Navbar = () => {
       ? user.name
       : user["https://your-app.com/username"] || user.nickname || user.name;
   };
-
-  // ⬇️ Handle login request to your backend after Auth0 authentication
+  const[displayname,setdisplayname]=useState("");
+  // Backend login (optional, keep if needed)
   useEffect(() => {
     const sendToBackend = async () => {
       if (isAuthenticated && user) {
         try {
-          const name = getDisplayName();
-          const response = await axios.post('/signin', {
-  email: user.email,
-  name: name,
-}, {
-  withCredentials: true // ✅ This sends cookies like 'token'
-});
-          console.log(response.status)
-          if (response.status !== 200) {
-            logout({ logoutParams: { returnTo: window.location.origin } });
-            navigate('/');
-          }
+          const response=await axios.post('/signin', {email: user.email,name: getDisplayName(),}, { withCredentials: true });
+          setdisplayname(response.data.name);
+          console.log(displayname);
         } catch (err) {
           console.error("Signin failed", err);
         }
       }
     };
-
     sendToBackend();
-  }, [isAuthenticated, user]); // ⬅️ Runs when Auth0 login is complete
-
-  const logou = async () => {
-    try {
-      const response = await axios.get('/logout');
-      if (response.status === 200) {
-        logout({ logoutParams: { returnTo: window.location.origin } });
-      } else {
-        navigate('/');
-      }
-    } catch (err) {
-      console.error("Logout failed", err);
+  }, [isAuthenticated, user]);
+  const handleLogout = async () => {
+  try {
+    const response = await axios.get('/logout', { withCredentials: true });
+    if (response.status === 200) {
+      // Only log out from Auth0 if backend logout succeeded
+      logout({ logoutParams: { returnTo: window.location.origin } });
+    } else {
+      alert('Logout failed on server. Please try again.');
     }
-  };
+  } catch (err) {
+    alert('Logout failed on server. Please try again.');
+    console.error('Backend logout failed:', err);
+  }
+};
 
-  const login = async () => {
-    loginWithRedirect(); // ⬅️ Just trigger redirect, rest handled in useEffect
-  };
+
+  // Helper for active link
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div>
-      <Link to="/">Logo Here</Link>
-      <Link to="/about">About</Link>
-      <Link to="/contact">Contact</Link>
-      {!user ? (
-        <button onClick={login}>Log In/SignUp</button>
-      ) : (
-        <button onClick={logou}>Logout</button>
-      )}
-    </div>
+    <nav className="bg-[#101010] border-b border-[#00ffcc] px-4 py-2 flex justify-between items-center shadow-md">
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-2 font-bold text-[#00ffcc] text-xl">
+        <span className="text-2xl">💹</span>
+        STARKVEST
+      </Link>
+
+      {/* Navigation Links */}
+      <div className="flex items-center gap-4">
+        <Link
+          to="/about"
+          className={`px-2 py-1 rounded transition ${
+            isActive('/about') ? 'text-[#00ffcc]' : 'text-white hover:text-[#00ffcc]'
+          }`}
+        >
+          About
+        </Link>
+        <Link
+          to="/contact"
+          className={`px-2 py-1 rounded transition ${
+            isActive('/contact') ? 'text-[#00ffcc]' : 'text-white hover:text-[#00ffcc]'
+          }`}
+        >
+          Contact
+        </Link>
+        {!isAuthenticated ? (
+          <button
+            onClick={loginWithRedirect}
+            className="ml-2 px-4 py-1 bg-[#00ffcc] text-black font-semibold rounded hover:bg-[#00ddb3] transition"
+          >
+            Log In
+          </button>
+        ) : (
+          <>
+            <span className="ml-2 text-white hidden sm:inline">{displayname}</span>
+            <button
+  onClick={handleLogout}
+  className="ml-2 px-4 py-1 bg-[#00ffcc] text-black font-semibold rounded hover:bg-[#00ddb3] transition"
+>
+  Logout
+</button>
+
+          </>
+        )}
+      </div>
+    </nav>
   );
 };
