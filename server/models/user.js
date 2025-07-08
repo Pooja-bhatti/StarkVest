@@ -10,7 +10,7 @@ const user_schema=mongoose.Schema({
     },
     current_funds:{
         type:Number,
-        default:0
+        default:100000
     },
     stocks:{
         type:mongoose.Schema.Types.ObjectId,
