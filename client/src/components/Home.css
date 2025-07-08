@@ -1,4 +1,10 @@
-
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg-dark-primary);
+  overflow-x: hidden;
+}
 :root {
     --bg-dark-primary: #0A0A0A;
     --bg-dark-secondary: #1A1A1A; 
@@ -252,4 +258,57 @@
         padding: 0.8rem 1.5rem;
         font-size: 0.9rem;
     }
+}
+
+.marketing-sections {
+  padding: 1rem 1rem; /* Reduced vertical & horizontal padding */
+  background: var(--bg-dark-secondary);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.marketing-content {
+  background: var(--glass-effect);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem 1rem; /* Reduced internal padding */
+  border-radius: 1rem;
+  max-width: 900px;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(0, 230, 184, 0.1);
+  animation: fadeIn 1s ease-out 1.2s forwards;
+  opacity: 0;
+  margin: 0; /* Ensure no external spacing adds height */
+}
+
+.marketing-content h2 {
+  margin-bottom: 1rem; /* Reduced margin */
+  font-size: 2rem;
+  color: var(--accent-teal-primary);
+  text-shadow: 0 0 10px rgba(0, 230, 184, 0.4);
+}
+
+.marketing-content p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem; /* Less spacing */
+  line-height: 1.5;
+}
+
+
+@media (max-width: 768px) {
+  .marketing-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .marketing-content h2 {
+    font-size: 2rem;
+  }
+
+  .marketing-content p {
+    font-size: 1rem;
+  }
 }

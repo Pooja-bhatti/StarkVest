@@ -1,113 +1,222 @@
-
-
-.navbar-container { 
-    background-color: var(--bg-dark-secondary);
-    padding: 1rem 2.5rem; 
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px var(--shadow-dark);
-    position: sticky; 
-    top: 0;
-    z-index: 1000; 
+/* .navbar-container {
+  background-color: red !important;
+  color: white;
+  min-height: 60px;
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+} */
+:root {
+  --bg-dark-primary: #0A0A0A;
+  --bg-dark-secondary: #1A1A1A;
+  --text-light: #E0E0E0;
+  --text-muted: #A0A0A0;
+  --accent-teal-primary: #00E6B8;
+  --accent-teal-dark: #00B89C;
+  --border-color: rgba(0, 230, 184, 0.2);
+  --shadow-dark: rgba(0, 0, 0, 0.5);
 }
 
+.fund-edit-form input::-webkit-outer-spin-button,
+.fund-edit-form input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
-.navbar-container a:nth-child(1) { 
-    font-family: 'Exo 2', sans-serif; 
+/* === NAVBAR CONTAINER === */
+.navbar-container {
+  background-color: var(--bg-dark-secondary);
+  padding: 1rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px var(--shadow-dark);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  flex-wrap: wrap;
+}
+
+/* === LOGO LINK === */
+.navbar-logo {
+    font-family: 'Exo 2', sans-serif;
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--accent-teal-primary);
     text-decoration: none;
-    letter-spacing: -0.03em; 
+    letter-spacing: -0.03em;
     transition: color 0.3s ease;
 }
 
-.navbar-container a:nth-child(1):hover {
+.navbar-logo:hover {
     color: var(--accent-teal-dark);
 }
 
 
-.navbar-container a:not(:first-child) { 
-    color: var(--text-muted); 
-    text-decoration: none;
+.navbar-container a:nth-child(1):hover {
+  color: var(--accent-teal-dark);
+}
+
+/* === NAVIGATION LINKS === */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--accent-teal-primary);
+}
+
+/* === AUTH SECTION === */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.username,
+.funds {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* === FUND EDIT FORM === */
+.fund-edit-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fund-edit-form input {
+    padding: 0.6rem 1rem;
     font-size: 1rem;
-    font-weight: 500;
-    margin-left: 1.5rem; /* Space between nav links */
-    transition: color 0.3s ease;
+    border-radius: 8px;
+    border: 1px solid var(--accent-teal-primary);
+    background-color: var(--bg-dark-secondary);
+    color: var(--text-light);
+    width: 140px; /* Adjust width as needed */
+    margin-right: 0.5rem;
 }
 
-.navbar-container a:not(:first-child):hover {
-    color: var(--accent-teal-primary); /* Teal on hover */
+.fund-edit-form input::placeholder {
+  color: #777;
 }
 
-/* Auth Buttons (Log In/SignUp, Logout) */
+.fund-edit-form button {
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  background-color: var(--accent-teal-primary);
+  color: var(--bg-dark-primary);
+  border-radius: 25px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fund-edit-form button:hover {
+  background-color: var(--accent-teal-dark);
+}
+
+/* === GENERAL BUTTONS === */
 .navbar-container button {
-    background-color: var(--accent-teal-primary);
-    color: var(--bg-dark-primary); /* Black text on teal button */
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 25px; /* Rounded pill shape */
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 2rem; /* Space from last nav link */
-    box-shadow: 0 2px 10px rgba(0, 230, 184, 0.3);
+  background-color: var(--accent-teal-primary);
+  color: var(--bg-dark-primary);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 230, 184, 0.3);
 }
 
 .navbar-container button:hover {
-    background-color: var(--accent-teal-dark); /* Darker teal on hover */
-    transform: translateY(-2px); /* Subtle lift effect */
-    box-shadow: 0 4px 15px rgba(0, 230, 184, 0.5);
+  background-color: var(--accent-teal-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 230, 184, 0.5);
 }
 
-/* Specific style for the Logout button if needed */
-.navbar-container button.logout-btn { /* Add this class to your Logout button in JS */
-    background-color: transparent;
-    border: 1px solid var(--accent-teal-primary);
-    color: var(--accent-teal-primary);
-    box-shadow: none;
+/* === LOGOUT BUTTON (Special Style) === */
+.navbar-container button.logout-btn {
+  background-color: transparent;
+  border: 1px solid var(--accent-teal-primary);
+  color: var(--accent-teal-primary);
+  box-shadow: none;
 }
 
 .navbar-container button.logout-btn:hover {
-    background-color: var(--accent-teal-primary);
-    color: var(--bg-dark-primary);
-    box-shadow: 0 0 15px rgba(0, 230, 184, 0.4);
+  background-color: var(--accent-teal-primary);
+  color: var(--bg-dark-primary);
+  box-shadow: 0 0 15px rgba(0, 230, 184, 0.4);
 }
 
-/* Responsive adjustments */
+/* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
-    .navbar-container {
-        flex-direction: column; /* Stack items vertically */
-        padding: 1rem 1.5rem;
-        gap: 1rem; /* Space between stacked items */
-    }
+  .navbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+  }
 
-    .navbar-container a:not(:first-child) {
-        margin-left: 0; /* Remove left margin for stacked links */
-        margin: 0.5rem 0; /* Add vertical margin */
-        font-size: 0.95rem;
-    }
+  .nav-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+  }
 
-    .navbar-container button {
-        margin-left: 0; /* Remove left margin for button */
-        margin-top: 1rem; /* Add space above button */
-        width: 100%; /* Make button full width */
-        max-width: 200px; /* Limit button width on smaller screens */
-    }
+  .nav-auth {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .navbar-container button,
+  .fund-edit-form button {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .fund-edit-form {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fund-edit-form input {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-    .navbar-container {
-        padding: 0.8rem 1rem;
-    }
-    .navbar-container a:nth-child(1) {
-        font-size: 1.5rem;
-    }
-    .navbar-container button {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-    }
+  .navbar-container {
+    padding: 0.8rem 1rem;
+  }
+
+  .navbar-container a:nth-child(1) {
+    font-size: 1.5rem;
+  }
+
+  .navbar-container button {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
 }
