@@ -4,7 +4,7 @@ const express=require('express')
 const User=require('./models/user')
 const get_token=require('./JWT/gentoken')
 const cooki_parser=require('cookie-parser');
-const user = require('./models/user');
+const Portfolio=require('./models/stocks');
 const isloggedin=require('./middleware/isloggedin');
 const app=express()
 app.use(express.urlencoded({extended:true}))
@@ -23,6 +23,9 @@ app.post('/signin', async (req, res) => {
 
         if (!myuser) {
             myuser = await User.create({ name, email });
+            const portF=await Portfolio.create({user:myuser._id});
+            myuser.stocks = portF._id;
+            await myuser.save();
             console.log(myuser)
             const token = get_token(myuser);
             res.status(200).cookie('token', token).json({ message: "User verified",name,fund:myuser.current_funds});

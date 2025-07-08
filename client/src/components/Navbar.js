@@ -145,6 +145,9 @@ const handleChange = (e) => {
       </button>
     ) : (
       <>
+        <Link to="/portfolio" className={`px-2 py-1 rounded transition ${
+        isActive('/portfolio') ? 'text-[#00ffcc]' : 'text-white hover:text-[#00ffcc]'
+      }`}>Portfolio</Link>
         <span className="ml-2 text-white hidden sm:inline">{displayname}</span>
         <button
           onClick={handleLogout}
