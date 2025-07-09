@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import "./Navbar.css"
+const API_KEY=process.env.REACT_APP_STOCK_API_KEY;
 export const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ export const Navbar = () => {
 
   const [displayname, setdisplayname] = useState("");
   const [fund, setfund] = useState(0);
-  const [formdata, setformdata] = useState({});
+  const [formdata, setformdata] = useState({funds:0,company:""});
 
   const getDisplayName = () => {
     if (!user) return '';
@@ -74,6 +75,30 @@ export const Navbar = () => {
     }
   };
 
+  const searchCompany=async(e)=>{
+    e.preventDefault();
+    console.log('Using API KEY:', API_KEY); // should NOT be undefined
+
+    try{
+      const response=await axios.get(`https://stock.indianapi.in/stock?name=${formdata.company}`, {headers: {
+          'x-api-key': API_KEY,
+        },
+      })
+
+      console.log(response);
+      if(response.data.error){
+        window.alert(response.data.error);
+      }
+      else{
+        navigate("/stock-details", { state: { stockData: response.data } });
+      }
+
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -94,6 +119,10 @@ export const Navbar = () => {
           <>
             <span className="username">👤 {displayname}</span>
             <span className="funds">💰 ₹{fund}</span>
+            <form onSubmit={searchCompany}>
+              <input name='company' value={formdata.company} type='text' onChange={handleChange} required />
+              <button type='submit'>Search</button>
+            </form>
             <form onSubmit={handleSubmit} className="fund-edit-form">
               <input
                 name="funds"
