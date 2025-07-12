@@ -49,7 +49,7 @@ export const Details = () => {
         if(tradeForm.action==="buy"){
           const response=await axios.post('/orderbuy',{data:tradeForm,stock:stockData.companyName,price});
           if(response.status===200){
-            window.alert("Congradulations your order was successfully placed and when execute you will be able to see it in portfolio")
+            window.alert(response.data.message);
             const quantity = parseInt(tradeForm.quantity, 10);
             if (!isNaN(price) && !isNaN(quantity)) {
               const cost = price * quantity;
@@ -65,7 +65,7 @@ export const Details = () => {
         else{
           const response=await axios.post('/ordersell',{data:tradeForm,stock:stockData.companyName,price});
           if(response.status===200){
-            window.alert("Congradulations your order was successfully placed and when execute you will be able to see change in portfolio")
+            window.alert(response.data.message);
             const quantity = parseInt(tradeForm.quantity, 10);
             if (!isNaN(price) && !isNaN(quantity)) {
               const cost = price * quantity;

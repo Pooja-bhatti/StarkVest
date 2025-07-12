@@ -159,8 +159,8 @@ const { fund, setFund } = useUser();
       return;
     }
 
-    console.log('Searching company:', cleanedCompany);
-    console.log('Using API KEY:', API_KEY);
+    // console.log('Searching company:', cleanedCompany);
+    // console.log('Using API KEY:', API_KEY);
 
     try {
       const response = await axios.get(`https://stock.indianapi.in/stock?name=${encodeURIComponent(cleanedCompany)}`, {
