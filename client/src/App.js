@@ -7,6 +7,7 @@ import { Contact } from './components/Contact';
 import { About } from './components/About';
 import { Portfolio } from './components/Portfolio';
 import { Details } from './components/Details';
+import { Buy } from './components/Buy';
 function App() {
   return (
     <>
@@ -17,6 +18,7 @@ function App() {
         <Route path='/contact' element={<Contact/>}/> 
         <Route path='/portfolio' element={<Portfolio/>}/>
         <Route path="/stock-details" element={<Details/>}/>
+        <Route path='/buy' element={<Buy/>}/>
       </Routes>
     </>
   );

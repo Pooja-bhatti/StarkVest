@@ -13,10 +13,7 @@ const stockSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  exchange:{
-    type:String,
-    require:true
-  }
+  
 }, { _id: false }); // optional: don't create _id for each stock entry
 
 const portfolioSchema = new mongoose.Schema({

@@ -1,17 +1,51 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
-import "./Navbar.css"
-const API_KEY=process.env.REACT_APP_STOCK_API_KEY;
+import { useUser } from '../context/UserContext';
+import "./Navbar.css";
+
+const API_KEY = process.env.REACT_APP_STOCK_API_KEY;
+
 export const Navbar = () => {
   const { loginWithRedirect, logout, user, isAuthenticated } = useAuth0();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [displayname, setdisplayname] = useState("");
-  const [fund, setfund] = useState(0);
-  const [formdata, setformdata] = useState({funds:0,company:""});
+const { fund, setFund } = useUser();
+
+  const [formdata, setformdata] = useState({ funds: 0, company: "" });
+  const [suggestions, setSuggestions] = useState([]);
+  const [companyList, setCompanyList] = useState([]);
+
+  const searchRef = useRef(null);
+
+  // Utility: Clean company name by removing common suffixes not accepted by API
+  const cleanCompanyName = (name) => {
+    let cleaned = name.toLowerCase();
+
+    const patternsToRemove = [
+      /\s+ltd\.?$/,
+      /\s+limited$/,
+      /\s+pvt\.? ltd\.?$/,
+      /\s+private limited$/,
+      /\s+limited liability company$/,
+      /\s+llc$/,
+      /\s+inc\.?$/,
+      /\s+corporation$/,
+      /\s+corp\.?$/,
+      /\s+plc$/,
+      /\s+co\.?$/,
+      /\s+company$/,
+    ];
+
+    patternsToRemove.forEach((pattern) => {
+      cleaned = cleaned.replace(pattern, '');
+    });
+
+    return cleaned.trim();
+  };
 
   const getDisplayName = () => {
     if (!user) return '';
@@ -31,7 +65,7 @@ export const Navbar = () => {
           }, { withCredentials: true });
 
           setdisplayname(response.data.name);
-          setfund(response.data.fund);
+          setFund(response.data.fund);
         } catch (err) {
           console.error("Signin failed", err);
         }
@@ -39,6 +73,32 @@ export const Navbar = () => {
     };
     sendToBackend();
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    const loadCompanyList = async () => {
+      try {
+        const res = await fetch('/companyList.json');
+        const data = await res.json();
+        setCompanyList(data);
+      } catch (err) {
+        console.error('Failed to load company list:', err);
+      }
+    };
+    loadCompanyList();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSuggestions([]);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -57,6 +117,20 @@ export const Navbar = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setformdata(prev => ({ ...prev, [name]: value }));
+
+    if (name === "company") {
+      const input = value.toLowerCase();
+      const filtered = companyList.filter(c =>
+        c.name.toLowerCase().startsWith(input) ||
+        c.symbol.toLowerCase().startsWith(input)
+      ).slice(0, 5); // top 5 suggestions
+      setSuggestions(filtered);
+    }
+  };
+
+  const handleSuggestionClick = (name) => {
+    setformdata(prev => ({ ...prev, company: name }));
+    setSuggestions([]);
   };
 
   const handleSubmit = async (e) => {
@@ -68,43 +142,47 @@ export const Navbar = () => {
     }
     try {
       const response = await axios.post('editfunds', { fund: cleanFund });
-      if (response.status === 200) setfund(cleanFund);
-      setformdata({ funds: 0 });
+      if (response.status === 200) setFund(cleanFund);
+      setformdata(prev => ({ ...prev, funds: 0 }));
     } catch (err) {
       console.log(err);
     }
   };
 
-  const searchCompany=async(e)=>{
+  const searchCompany = async (e) => {
     e.preventDefault();
-    console.log('Using API KEY:', API_KEY); // should NOT be undefined
 
-    try{
-      const response=await axios.get(`https://stock.indianapi.in/stock?name=${formdata.company}`, {headers: {
-          'x-api-key': API_KEY,
-        },
-      })
+    const cleanedCompany = cleanCompanyName(formdata.company);
 
-      console.log(response);
-      if(response.data.error){
+    if (!cleanedCompany) {
+      window.alert("Please enter a valid company name.");
+      return;
+    }
+
+    console.log('Searching company:', cleanedCompany);
+    console.log('Using API KEY:', API_KEY);
+
+    try {
+      const response = await axios.get(`https://stock.indianapi.in/stock?name=${encodeURIComponent(cleanedCompany)}`, {
+        headers: { 'x-api-key': API_KEY },
+      });
+
+      if (response.data.error) {
         window.alert(response.data.error);
-      }
-      else{
+      } else {
         navigate("/stock-details", { state: { stockData: response.data } });
       }
-
+    } catch (err) {
+      console.error('API error:', err);
+      window.alert("Failed to fetch stock data. Please try again later.");
     }
-    catch(err){
-      console.log(err);
-    }
-  }
+  };
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <div className="navbar-container">
       <Link to="/" className="navbar-logo">💹 STARKVEST</Link>
-
 
       <div className="nav-links">
         <Link to="/about" className={isActive('/about') ? 'active' : ''}>About</Link>
@@ -119,10 +197,38 @@ export const Navbar = () => {
           <>
             <span className="username">👤 {displayname}</span>
             <span className="funds">💰 ₹{fund}</span>
-            <form onSubmit={searchCompany}>
-              <input name='company' value={formdata.company} type='text' onChange={handleChange} required />
+
+            <form onSubmit={searchCompany} className="search-form" autoComplete="off" ref={searchRef}>
+              <input
+                name='company'
+                value={formdata.company}
+                type='text'
+                onChange={handleChange}
+                placeholder="Search company..."
+                autoComplete="off"
+              />
               <button type='submit'>Search</button>
+
+              {suggestions.length > 0 && (
+                <ul className="suggestions-dropdown">
+                  {suggestions.map((item, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleSuggestionClick(item.name)}
+                      tabIndex={0}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleSuggestionClick(item.name);
+                        }
+                      }}
+                    >
+                      {item.name} ({item.symbol})
+                    </li>
+                  ))}
+                </ul>
+              )}
             </form>
+
             <form onSubmit={handleSubmit} className="fund-edit-form">
               <input
                 name="funds"
