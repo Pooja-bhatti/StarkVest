@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
+import './Details.css';
 
 export const Details = () => {
   const { setFund } = useUser();
@@ -117,27 +118,27 @@ export const Details = () => {
   //   navigate('/buy', { state: { stockData } });
   // };
   return (
-    <div className='text-white p-4'>
-      <h2 className='text-xl font-bold mb-4'>{stockData.companyName}</h2>
+    <div className='details-page'>
+      <h2 className='details-title'>{stockData.companyName}</h2>
       <p><strong>Industry:</strong> {stockData.industry}</p>
 
-      <h3 className='mt-4 text-lg font-semibold'>Stock Prices</h3>
+      <h3 className='section-title'>Stock Prices</h3>
       <p><strong>BSE:</strong> ₹{stockData.currentPrice?.BSE}</p>
       <p><strong>NSE:</strong> ₹{stockData.currentPrice?.NSE}</p>
       <p><strong>52 Week High:</strong> ₹{stockData.yearHigh}</p>
       <p><strong>52 Week Low:</strong> ₹{stockData.yearLow}</p>
       <p><strong>Percent Change:</strong> {stockData.percentChange}%</p>
 
-      <h3 className='mt-4 text-lg font-semibold'>Financial Info</h3>
+      <h3 className='section-title'>Financial Info</h3>
       <p><strong>Market Cap:</strong> ₹{marketCap ?? "N/A"}</p>
       <p><strong>PE Ratio:</strong> {peRatio ?? "N/A"}</p>
       <p><strong>EPS:</strong> ₹{eps ?? "N/A"}</p>
 
-      <h3 className='mt-4 text-lg font-semibold'>Company Description</h3>
+      <h3 className='section-title'>Company Description</h3>
       <p>{stockData.companyProfile?.companyDescription}</p>
-      <form className="mt-6 space-y-4 text-white" onSubmit={handleSubmit}>
-        <div>
-          <label className="mr-4 font-medium">
+      <form className="trade-form" onSubmit={handleSubmit}>
+        <div className='form-group'>
+          <label className="trade-action-label">
             <input
               type="radio"
               name="action"
@@ -148,7 +149,7 @@ export const Details = () => {
             />
             Buy
           </label>
-          <label className="font-medium">
+          <label className="trade-action-label">
             <input
               type="radio"
               name="action"
@@ -161,23 +162,35 @@ export const Details = () => {
           </label>
         </div>
 
-        <div>
-          <label htmlFor="exchange" className="block font-medium mb-1">Select Exchange:</label>
+        <div class='form-group'>
+          <label htmlFor="exchange" className="trade-label">Select Exchange:</label>
           <select
             name="exchange"
             id="exchange"
             value={tradeForm.exchange}
             onChange={handleFormChange}
-            className="bg-gray-800 border border-gray-600 p-2 rounded"
+            className="trade-label"
           >
             <option value="NSE">NSE</option>
             <option value="BSE">BSE</option>
           </select>
         </div>
 
-        <input type="number" className='text-black' name="quantity" value={tradeForm.quantity} required onChange={handleFormChange}/>
+        <div className='form-group'>
+            <label htmlFor="quantity" className='trade-label'>Quantity:</label> {/* Added label for quantity */}
+            <input
+                type="number"
+                className='trade-input'
+                name="quantity"
+                id="quantity"
+                value={tradeForm.quantity}
+                required
+                onChange={handleFormChange}
+                min="1"
+            />
+        </div>
 
-        <button type="submit" className="bg-green-500 text-black font-semibold px-4 py-2 rounded hover:bg-green-400 transition">
+        <button type="submit" className="trade-submit-button">
           Submit
         </button>
       </form>
