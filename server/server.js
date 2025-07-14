@@ -29,7 +29,7 @@ app.post('/signin', async (req, res) => {
             res.status(200).cookie('token', token).json({ message: "User verified",name,fund:myuser.current_funds});
         }
         else{
-            console.log(myuser)
+            // console.log(myuser)
             const token = get_token(myuser);
             res.status(200).cookie('token', token).json({ message: "User verified",name:myuser.name,fund:myuser.current_funds});
         }
@@ -38,6 +38,12 @@ app.post('/signin', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+app.get('/logout', isloggedin, (req, res) => {
+  res.clearCookie('token'); // Correct cookie name
+  return res.status(200).send('Logged out successfully');
+});
+
 
 app.post('/editfunds',isloggedin,async(req,res)=>{
     const user=req.user;
@@ -277,5 +283,9 @@ app.get('/userdata',isloggedin,async(req,res)=>{
 
 
 
+
+// function my_func(){
+//   console.log("listening to 5000")
+// }
 
 app.listen(5000,()=>{console.log("listening over 5000")})
