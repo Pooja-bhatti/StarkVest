@@ -6,17 +6,13 @@ const get_token=require('./JWT/gentoken')
 const cooki_parser=require('cookie-parser');
 const Portfolio=require('./models/stocks');
 const isloggedin=require('./middleware/isloggedin');
-// const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 const app=express()
-// const genAI = new GoogleGenerativeAI(process.env.gemini_API);
+
 app.use(express.urlencoded({extended:true}))
 app.use(cooki_parser());
 app.use(express.json())
-// const cors = require('cors');
-// app.use(cors({
-//   origin: 'http://localhost:3000', // or your frontend URL
-//   credentials: true
-// }));
+
 app.post('/signin', async (req, res) => {
     const { email, name } = req.body;
 
@@ -56,37 +52,73 @@ app.post('/editfunds',isloggedin,async(req,res)=>{
 })
 
 
-app.get('/logout',isloggedin,(req,res)=>{
-    res.clearCookie('token');
+function getMarketStatusIST() {
+  const now = new Date();
 
-    res.status(200).json({ message: 'Logged out' });
-})
+  // Convert to IST timezone
+  const istString = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+  const ist = new Date(istString);
 
-function isMarketOpenIST() {
-  const nowUTC = new Date();
-
-  // Convert UTC to IST (UTC + 5:30)
-  const istOffset = 5.5 * 60 * 60 * 1000;
-  const nowIST = new Date(nowUTC.getTime() + istOffset);
-
-  const hours = nowIST.getHours();
-  const minutes = nowIST.getMinutes();
+  const hours = ist.getHours();
+  const minutes = ist.getMinutes();
   const currentMinutes = hours * 60 + minutes;
 
-  const openMinutes = 9 * 60 + 15;  // 9:15 AM = 555
-  const closeMinutes = 15 * 60 + 30; // 3:30 PM = 930
+  const openMinutes = 9 * 60 + 15;   // 555
+  const closeMinutes = 15 * 60 + 30; // 930
 
-  return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+  const isOpen = currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+
+  const formattedTime = ist.toLocaleTimeString('en-IN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  return {
+    isOpen,
+    time: formattedTime
+  };
 }
+
+// function getMarketStatusIST() {
+//   // Manually simulate 1:00:00 PM IST on any date
+//   const ist = new Date('2025-07-14T13:00:00+05:30'); // ISO string with IST offset
+
+//   const hours = ist.getHours();
+//   const minutes = ist.getMinutes();
+//   const currentMinutes = hours * 60 + minutes;
+
+//   const openMinutes = 9 * 60 + 15;   // 555
+//   const closeMinutes = 15 * 60 + 30; // 930
+
+//   const isOpen = currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+
+//   const formattedTime = ist.toLocaleTimeString('en-IN', {
+//     hour: '2-digit',
+//     minute: '2-digit',
+//     second: '2-digit',
+//     hour12: true
+//   });
+
+//   return {
+//     isOpen,
+//     time: formattedTime
+//   };
+// }
+
+
+
 
 
 
 app.post('/orderbuy', isloggedin, async (req, res) => {
-  if (!isMarketOpenIST()) {
-    return res.status(202).json({
-      message: "Market is closed. Trades allowed only between 9:15 AM and 3:30 PM IST."
-    });
-  }
+  const { isOpen, time } = getMarketStatusIST();
+if (!isOpen) {
+  return res.status(202).json({
+    message: `Market is closed as of ${time}. Trades are allowed only between 9:15 AM and 3:30 PM IST.`
+  });
+}
   const { action,quantity} = req.body.data;
   const stock=req.body.stock;
 
@@ -142,7 +174,8 @@ app.post('/orderbuy', isloggedin, async (req, res) => {
 
       await portfolio.save();
 
-
+      myuser.netInvestment+=cost;
+      await myuser.save();
       return res.status(200).json({ message: "Order executed successfully." });
     }
 
@@ -155,44 +188,15 @@ app.post('/orderbuy', isloggedin, async (req, res) => {
   }
 });
 
-// async function askDeepSeek(prompt) {
-//   try {
-//     console.log(prompt);
-//     const response=await fetch("https://openrouter.ai/api/v1/chat/completions", {
-//     method: "POST",
-//     headers: {
-//       "Authorization": "Bearer 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",
-//       "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
-//       "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({
-//       "model": "deepseek/deepseek-r1-0528:free",
-//       "messages": [
-//         {
-//           "role": "user",
-//           "content": prompt
-//         }
-//       ]
-//     })
-//   });
-//   const data=await response.json();
-//   console.log(data);
 
-//   return data.choices?.[0]?.message?.content||"No response";
-//   } 
-//   catch (error) {
-//     console.error("DeepSeek Error:", error.response?.data || error.message);
-//     return null;
-//   }
-// }
 
 app.post('/ordersell', isloggedin, async (req, res) => {
-  if (!isMarketOpenIST()) {
-    return res.status(202).json({
-      message: "Market is closed. Trades allowed only between 9:15 AM and 3:30 PM IST."
-    });
-  }
+  const { isOpen, time } = getMarketStatusIST();
+if (!isOpen) {
+  return res.status(202).json({
+    message: `Market is closed as of ${time}. Trades are allowed only between 9:15 AM and 3:30 PM IST.`
+  });
+}
   const { quantity } = req.body.data;
   const stock = req.body.stock;
   const price = parseFloat(req.body.price); // Current price from frontend
@@ -206,15 +210,7 @@ app.post('/ordersell', isloggedin, async (req, res) => {
   }
 
   try {
-    // const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }); 
-
-    // const prompt = "Is the Indian stock market (NSE/BSE) currently open right now? Answer in a single word: Yes or No. Just one single word not even a dot after that. Assume the current time is Indian Standard Time (IST).";
-    // const result = await model.generateContent(prompt);
-    // const text = result.response.text().toLowerCase();
-
-    // if (!text.includes("yes")) {
-    //   return res.status(403).json({ message: "Market is currently closed. You can only sell stocks during market hours (9:15 AM - 3:30 PM IST)." });
-    // }
+    
     const portfolio = await Portfolio.findOne({ user: myuser._id });
 
     if (!portfolio) {
@@ -239,7 +235,11 @@ app.post('/ordersell', isloggedin, async (req, res) => {
     }
 
     const credit = price * parsedQuantity;
+    const realisedProfit = (price - existingStock.average_price) * parsedQuantity;
+    myuser.realisedPL += realisedProfit;
     myuser.current_funds += credit;
+
+
 
     await myuser.save();
     await portfolio.save();
@@ -255,61 +255,6 @@ app.post('/ordersell', isloggedin, async (req, res) => {
   }
 });
 
-// app.post('/ordersell', isloggedin, async (req, res) => {
-//   const { quantity } = req.body.data;
-//   const stock = req.body.stock;
-//   const price = parseFloat(req.body.price);
-//   const myuser = req.user;
-//   const parsedQuantity = parseInt(quantity);
-
-//   if (isNaN(parsedQuantity) || parsedQuantity <= 0 || isNaN(price)) {
-//     return res.status(400).json({ message: "Invalid quantity or price format" });
-//   }
-
-//   // Ask DeepSeek if market is open
-//   const prompt = "Is the Indian stock market (NSE/BSE) currently open? Answer in just one word: Yes or No. Assume the current time is in Indian Standard Time.";
-//   const response = await askDeepSeek(prompt);
-
-//   if (!response || !response.toLowerCase().includes("yes")) {
-//     return res.status(403).json({ message: "Market is currently closed. Try during NSE/BSE market hours." });
-//   }
-
-//   try {
-//     const portfolio = await Portfolio.findOne({ user: myuser._id });
-//     if (!portfolio) {
-//       return res.status(400).json({ message: `You do not hold any stocks to sell.` });
-//     }
-
-//     const existingStock = portfolio.stocks.find(s => s.company === stock);
-//     if (!existingStock) {
-//       return res.status(201).json({ message: `You do not own any shares of ${stock}.` });
-//     }
-
-//     if (existingStock.quantity < parsedQuantity) {
-//       return res.status(201).json({ message: `Insufficient shares to sell. You only have ${existingStock.quantity}.` });
-//     }
-
-//     existingStock.quantity -= parsedQuantity;
-//     if (existingStock.quantity === 0) {
-//       portfolio.stocks = portfolio.stocks.filter(s => s.company !== stock);
-//     }
-
-//     const credit = price * parsedQuantity;
-//     myuser.current_funds += credit;
-
-//     await myuser.save();
-//     await portfolio.save();
-
-//     return res.status(200).json({
-//       message: `Successfully sold ${parsedQuantity} shares of ${stock} for ₹${credit.toFixed(2)}.`,
-//       updatedFunds: myuser.current_funds
-//     });
-
-//   } catch (err) {
-//     console.error("Sell error:", err);
-//     return res.status(500).json({ message: "Internal server error" });
-//   }
-// });
 
 app.get('/getstocks', isloggedin, async (req, res) => {
   const myuser = req.user;
@@ -317,12 +262,17 @@ app.get('/getstocks', isloggedin, async (req, res) => {
     const portfolio = await Portfolio.findOne({ user: myuser._id });
     if (!portfolio) return res.status(200).json({ stocks: [] });
 
-    res.status(200).json({ stocks: portfolio.stocks }); // ✅ FIXED: return only stocks
+    res.status(200).json({ stocks: portfolio.stocks }); 
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to fetch portfolio" });
   }
 });
+
+app.get('/userdata',isloggedin,async(req,res)=>{
+  const myuser=req.user;
+  return res.status(200).json({investment:myuser.netInvestment,PL:myuser.realisedPL});
+})
 
 
 

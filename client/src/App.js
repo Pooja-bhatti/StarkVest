@@ -8,6 +8,7 @@ import { About } from './components/About';
 import { Portfolio } from './components/Portfolio';
 import { Details } from './components/Details';
 import { Buy } from './components/Buy';
+import { Profile } from './components/Profile';
 function App() {
   return (
     <>
@@ -19,6 +20,7 @@ function App() {
         <Route path='/portfolio' element={<Portfolio/>}/>
         <Route path="/stock-details" element={<Details/>}/>
         <Route path='/buy' element={<Buy/>}/>
+        <Route path='/profile' element={<Profile/>}/>
       </Routes>
     </>
   );

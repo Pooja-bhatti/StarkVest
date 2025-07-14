@@ -195,8 +195,9 @@ const { fund, setFund } = useUser();
       <div className="nav-auth">
         {isAuthenticated ? (
           <>
-            <span className="username">👤 {displayname}</span>
-            <span className="funds">💰 ₹{fund}</span>
+          <Link to="/profile" className="username"><span className="username">👤 {displayname}</span></Link>
+            
+            <span className="funds">💰 ₹{Number(fund).toFixed(2)}</span>
 
             <form onSubmit={searchCompany} className="search-form" autoComplete="off" ref={searchRef}>
               <input

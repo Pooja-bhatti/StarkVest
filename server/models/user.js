@@ -15,6 +15,14 @@ const user_schema=mongoose.Schema({
     stocks:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Portfolio'
+    },
+    realisedPL:{
+        type:Number,
+        default:0
+    },
+    netInvestment:{
+        type:Number,
+        default:0
     }
 })
 module.exports=mongoose.model('user',user_schema)

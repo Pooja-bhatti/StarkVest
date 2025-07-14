@@ -5,10 +5,11 @@ const API_KEY = process.env.REACT_APP_STOCK_API_KEY;
 
 export const Portfolio = () => {
   const [stocks, setStocks] = useState([]);
-  const [activeTrade, setActiveTrade] = useState(null); // company name
+  const [activeTrade, setActiveTrade] = useState(null);
   const [tradeQuantity, setTradeQuantity] = useState('');
-  const [selectedExchange, setSelectedExchange] = useState({}); // { TCS: "NSE" }
-  const [livePrices, setLivePrices] = useState({}); // { TCS: { NSE: 1234, BSE: 1220 } }
+  const [selectedExchange, setSelectedExchange] = useState({});
+  const [livePrices, setLivePrices] = useState({});
+  const [unrealisedPL, setUnrealisedPL] = useState(0);
 
   // Fetch portfolio
   useEffect(() => {
@@ -51,54 +52,72 @@ export const Portfolio = () => {
             BSE: res.data.currentPrice?.BSE
           }
         }));
-        setSelectedExchange(prev => ({ ...prev, [company]: 'NSE' })); // default to NSE
+        setSelectedExchange(prev => ({ ...prev, [company]: 'NSE' }));
       }
     } catch (err) {
       console.error(`Live price fetch failed for ${company}:`, err);
     }
   };
 
+  // Calculate unrealised P/L whenever prices, stocks, or exchange selection change
+  useEffect(() => {
+    let total = 0;
+    stocks.forEach(stock => {
+      const live = livePrices[stock.company];
+      const exchange = selectedExchange[stock.company] || 'NSE';
+      const livePrice = live?.[exchange];
+
+      if (livePrice) {
+        const pl = (livePrice - stock.average_price) * stock.quantity;
+        total += pl;
+      }
+    });
+    setUnrealisedPL(total);
+  }, [livePrices, stocks, selectedExchange]);
+
   const handleBuySell = async (type, company) => {
     const quantity = parseInt(tradeQuantity);
     const exchange = selectedExchange[company];
     const price = livePrices[company]?.[exchange];
 
-    if (!quantity || !price||quantity<=0) return alert("Enter valid quantity and wait for price.");
+    if (!quantity || !price || quantity <= 0) return alert("Enter valid quantity and wait for price.");
 
-    const con=window.confirm(`Are you sure you want to ${type} ${quantity} stocks of ${company}`);
-    if(con){
-      try {
-        if (type === "buy") {
-          const res = await axios.post('/orderbuy', {
-            data: { action: 'buy', quantity },
-            stock: company,
-            price,
-          });
-          alert(res.data.message);
-        } else {
-          const res = await axios.post('/ordersell', {
-            data: { quantity },
-            stock: company,
-            price,
-          });
-          alert(res.data.message);
-        }
-        window.location.reload();
-      } catch (err) {
-        alert("Trade failed");
-        console.error(err);
+    const con = window.confirm(`Are you sure you want to ${type} ${quantity} stocks of ${company}?`);
+    if (!con) return;
+
+    try {
+      if (type === "buy") {
+        const res = await axios.post('/orderbuy', {
+          data: { action: 'buy', quantity },
+          stock: company,
+          price,
+        });
+        alert(res.data.message);
+      } else {
+        const res = await axios.post('/ordersell', {
+          data: { quantity },
+          stock: company,
+          price,
+        });
+        alert(res.data.message);
       }
-
+      window.location.reload();
+    } catch (err) {
+      alert("Trade failed");
+      console.error(err);
     }
-    else{
-      return;
-    }
-
   };
 
   return (
     <div className="text-white">
-      <h2 className="text-xl font-bold mb-4">Your Portfolio</h2>
+      <h2 className="text-xl font-bold mb-1">Your Portfolio</h2>
+      <p className="text-lg mb-4">
+        Unrealised P/L:
+        <span className={unrealisedPL >= 0 ? "text-green-400 ml-2" : "text-red-400 ml-2"}>
+          ₹{unrealisedPL.toFixed(2)}
+        </span>
+      </p>
+
       {stocks.length === 0 ? (
         <p>No stocks to show</p>
       ) : (
