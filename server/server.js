@@ -71,7 +71,8 @@ async function getMarketStatusIST() {
     const status = await page.$eval('.topdatearea strong', el => el.textContent.trim());
 
     await browser.close();
-    return status=="Open"?true:false;
+    console.log(status);
+    return status==="Open"?true:false;
 
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -111,9 +112,9 @@ async function getMarketStatusIST() {
 
 app.post('/orderbuy', isloggedin, async (req, res) => {
   
-if (!getMarketStatusIST()) {
+if (!(await getMarketStatusIST())) {
   return res.status(202).json({
-    message: `Market is closed as of now`
+    message: `Market is closed as of now We can not proceed with the order`
   });
 }
   const { action,quantity} = req.body.data;
@@ -188,9 +189,9 @@ if (!getMarketStatusIST()) {
 
 
 app.post('/ordersell', isloggedin, async (req, res) => {
-  if (!getMarketStatusIST()) {
+  if (!(await getMarketStatusIST())) {
   return res.status(202).json({
-    message: `Market is closed as of now`
+    message: `Market is closed as of now We can not proceed with the order`
   });
 }
   const { quantity } = req.body.data;
