@@ -6,6 +6,7 @@ const get_token=require('./JWT/gentoken')
 const cooki_parser=require('cookie-parser');
 const Portfolio=require('./models/stocks');
 const isloggedin=require('./middleware/isloggedin');
+const puppeteer = require('puppeteer');
 
 const app=express()
 
@@ -58,33 +59,23 @@ app.post('/editfunds',isloggedin,async(req,res)=>{
 })
 
 
-function getMarketStatusIST() {
-  const now = new Date();
+async function getMarketStatusIST() {
+  try {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto('https://www.bseindia.com/markets.html', { waitUntil: 'networkidle2' });
 
-  // Convert to IST timezone
-  const istString = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-  const ist = new Date(istString);
+    // Wait for the element to load (adjust selector if needed)
+    await page.waitForSelector('.topdatearea strong');
 
-  const hours = ist.getHours();
-  const minutes = ist.getMinutes();
-  const currentMinutes = hours * 60 + minutes;
+    const status = await page.$eval('.topdatearea strong', el => el.textContent.trim());
 
-  const openMinutes = 9 * 60 + 15;   // 555
-  const closeMinutes = 15 * 60 + 30; // 930
+    await browser.close();
+    return status=="Open"?true:false;
 
-  const isOpen = currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
-
-  const formattedTime = ist.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true
-  });
-
-  return {
-    isOpen,
-    time: formattedTime
-  };
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 // function getMarketStatusIST() {
@@ -119,10 +110,10 @@ function getMarketStatusIST() {
 
 
 app.post('/orderbuy', isloggedin, async (req, res) => {
-  const { isOpen, time } = getMarketStatusIST();
-if (!isOpen) {
+  
+if (!getMarketStatusIST()) {
   return res.status(202).json({
-    message: `Market is closed as of ${time}. Trades are allowed only between 9:15 AM and 3:30 PM IST.`
+    message: `Market is closed as of now`
   });
 }
   const { action,quantity} = req.body.data;
@@ -197,10 +188,9 @@ if (!isOpen) {
 
 
 app.post('/ordersell', isloggedin, async (req, res) => {
-  const { isOpen, time } = getMarketStatusIST();
-if (!isOpen) {
+  if (!getMarketStatusIST()) {
   return res.status(202).json({
-    message: `Market is closed as of ${time}. Trades are allowed only between 9:15 AM and 3:30 PM IST.`
+    message: `Market is closed as of now`
   });
 }
   const { quantity } = req.body.data;
