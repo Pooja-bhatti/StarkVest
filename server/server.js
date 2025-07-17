@@ -6,7 +6,12 @@ const get_token=require('./JWT/gentoken')
 const cooki_parser=require('cookie-parser');
 const Portfolio=require('./models/stocks');
 const isloggedin=require('./middleware/isloggedin');
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+
+const order=require('./middleware/order');
+
 
 const app=express()
 
@@ -59,64 +64,28 @@ app.post('/editfunds',isloggedin,async(req,res)=>{
 })
 
 
-async function getMarketStatusIST() {
-  try {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
-    await page.goto('https://www.bseindia.com/markets.html', { waitUntil: 'networkidle2' });
+// async function getMarketStatusIST() {
+//   try {
+//     const browser = await puppeteer.launch({ headless: true });
+//     const page = await browser.newPage();
+//     await page.goto('https://www.bseindia.com/markets.html', { waitUntil: 'networkidle2' });
 
-    // Wait for the element to load (adjust selector if needed)
-    await page.waitForSelector('.topdatearea strong');
+//     // Wait for the element to load (adjust selector if needed)
+//     await page.waitForSelector('.topdatearea strong');
 
-    const status = await page.$eval('.topdatearea strong', el => el.textContent.trim());
+//     const status = await page.$eval('.topdatearea strong', el => el.textContent.trim());
 
-    await browser.close();
-    console.log(status);
-    return status==="Open"?true:false;
+//     await browser.close();
+//     console.log(status);
+//     return status==="Open"?true:false;
 
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// function getMarketStatusIST() {
-//   // Manually simulate 1:00:00 PM IST on any date
-//   const ist = new Date('2025-07-14T13:00:00+05:30'); // ISO string with IST offset
-
-//   const hours = ist.getHours();
-//   const minutes = ist.getMinutes();
-//   const currentMinutes = hours * 60 + minutes;
-
-//   const openMinutes = 9 * 60 + 15;   // 555
-//   const closeMinutes = 15 * 60 + 30; // 930
-
-//   const isOpen = currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
-
-//   const formattedTime = ist.toLocaleTimeString('en-IN', {
-//     hour: '2-digit',
-//     minute: '2-digit',
-//     second: '2-digit',
-//     hour12: true
-//   });
-
-//   return {
-//     isOpen,
-//     time: formattedTime
-//   };
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
 // }
 
-
-
-
-
-
-app.post('/orderbuy', isloggedin, async (req, res) => {
+app.post('/orderbuy', isloggedin,order, async (req, res) => {
   
-if (!(await getMarketStatusIST())) {
-  return res.status(202).json({
-    message: `Market is closed as of now We can not proceed with the order`
-  });
-}
   const { action,quantity} = req.body.data;
   const stock=req.body.stock;
 
@@ -188,12 +157,8 @@ if (!(await getMarketStatusIST())) {
 
 
 
-app.post('/ordersell', isloggedin, async (req, res) => {
-  if (!(await getMarketStatusIST())) {
-  return res.status(202).json({
-    message: `Market is closed as of now We can not proceed with the order`
-  });
-}
+app.post('/ordersell', isloggedin,order, async (req, res) => {
+
   const { quantity } = req.body.data;
   const stock = req.body.stock;
   const price = parseFloat(req.body.price); // Current price from frontend
@@ -271,12 +236,5 @@ app.get('/userdata',isloggedin,async(req,res)=>{
   return res.status(200).json({investment:myuser.netInvestment,PL:myuser.realisedPL});
 })
 
-
-
-
-
-// function my_func(){
-//   console.log("listening to 5000")
-// }
 
 app.listen(5000,()=>{console.log("listening over 5000")})

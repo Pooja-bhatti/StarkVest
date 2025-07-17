@@ -6,8 +6,10 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.0",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.1",
-    "puppeteer": "^24.12.1"
+    "path": "^0.12.7",
+    "puppeteer": "^24.14.0"
   }
 }
