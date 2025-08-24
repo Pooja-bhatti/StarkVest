@@ -212,28 +212,26 @@ app.get('/getstocks', isloggedin, async (req, res) => {
   }
 });
 
-app.post("/aisuggest", isloggedin,async (req, res) => {
+
+app.post("/aisuggest", isloggedin, async (req, res) => {
   try {
     const { action, budget } = req.body;
 
-    if (!action) {
-      return res.status(400).json({ error: "Missing 'action' in body" });
-    }
+    if (!action) return res.status(400).json({ error: "Missing 'action' in body" });
 
-  
     const styleGuide = `
 Return ONLY the list lines as requested. No intro, no bullets, no disclaimers.
-Limit adjectives. Keep each line terse.
-    `.trim();
+Limit adjectives. Keep each line terse.`.trim();
 
     let prompt = "";
 
-    if (action === "buy") {
-      if (!budget || Number(budget) <= 0) {
-        return res.status(400).json({ error: "Valid 'budget' is required for action=buy" });
-      }
-      
-      prompt = `
+    switch (action) {
+      case "buy":
+        if (!budget || Number(budget) <= 0) {
+          return res.status(400).json({ error: "Valid 'budget' is required for action=buy" });
+        }
+
+        prompt = `
 You are an investing assistant for Indian equities/ETFs.
 Task: Suggest a compact plan for ₹${budget}.
 ${styleGuide}
@@ -243,25 +241,28 @@ Name | Sector | Allocation%
 
 Allocations must sum to 100%.
 Do not include prices or explanations beyond the format.
-      `.trim();
-    } else if (action === "sell") {
-      
-      let portfolioSummary = "None";
-      if (req.user && req.user._id) {
-        const portfolio = await Portfolio.findOne({ user: req.user._id }).lean();
-        if (portfolio && Array.isArray(portfolio.stocks) && portfolio.stocks.length) {
-          portfolioSummary = portfolio.stocks
-            .map(s => `${s.company} | Qty:${s.quantity} | Avg₹:${s.average_price}`)
-            .join("\n");
+        `.trim();
+        break;
+
+      case "sell":
+        let portfolioSummary = "None";
+
+        if (req.user?._id) {
+          const portfolio = await Portfolio.findOne({ user: req.user._id }).lean();
+          if (portfolio?.stocks?.length > 0) {
+            portfolioSummary = portfolio.stocks
+              .map(({ company, quantity, average_price }) =>
+                `${company} | Qty:${quantity} | Avg₹:${average_price}`
+              )
+              .join("\n");
+          }
         }
-      }
 
-      if (portfolioSummary === "None") {
-        
-        return res.json({ answer: "No saved portfolio found." });
-      }
+        if (portfolioSummary === "None") {
+          return res.json({ answer: "No saved portfolio found." });
+        }
 
-      prompt = `
+        prompt = `
 You are an investing assistant for Indian equities.
 Task: From the portfolio, identify up to 5 positions to SELL or TRIM.
 ${styleGuide}
@@ -271,10 +272,11 @@ ${portfolioSummary}
 
 Output up to 5 lines. Format per line:
 Company | Action(SELL/TRIM/HOLD) | Reason(<=6 words)
-      `.trim();
-    } else if (action === "sectors") {
-  
-  prompt = `
+        `.trim();
+        break;
+
+      case "sectors":
+        prompt = `
 You are an investing assistant for Indian markets.
 Task: List top 5 sectors to focus on right now.
 ${styleGuide}
@@ -285,33 +287,31 @@ Sector | 1–2 reasons(<=6 words) | Example Company
 
 Example Company must be an actual large-cap or mid-cap Indian stock from that sector.
 No intro, no outro, no extra commentary.
-  `.trim();
-}else {
-      return res.status(400).json({ error: "Invalid 'action'. Use 'buy' | 'sell' | 'sectors'." });
+        `.trim();
+        break;
+
+      default:
+        return res.status(400).json({ error: "Invalid 'action'. Use 'buy' | 'sell' | 'sectors'." });
     }
 
-    
     const aiRes = await axios.post(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
       {
-        contents: [
-          { role: "user", parts: [{ text: prompt }] }
-        ]
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
       },
       {
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY, // put in .env
+          "x-goog-api-key": process.env.GEMINI_API_KEY,
         },
-        timeout: 20000
+        timeout: 20000,
       }
     );
 
-    const answer =
-      aiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
-      "No response";
+    const answer = aiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "No response";
 
     return res.json({ answer });
+
   } catch (err) {
     console.error("Error in /aisuggest:", err.response?.data || err.message);
     return res.status(500).json({
@@ -319,7 +319,8 @@ No intro, no outro, no extra commentary.
       details: err.response?.data || err.message,
     });
   }
-});
+})
+
 
 
 app.get('/userdata',isloggedin,async(req,res)=>{

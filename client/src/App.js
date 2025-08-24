@@ -22,7 +22,7 @@ function App() {
         <Route path="/stock-details" element={<Details/>}/>
         <Route path='/buy' element={<Buy/>}/>
         <Route path='/profile' element={<Profile/>}/>
-        <Route path='ai' element={<Ai/>}></Route>
+        <Route path='/ai' element={<Ai/>}></Route>
       </Routes>
     </>
   );
