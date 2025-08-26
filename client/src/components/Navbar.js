@@ -168,9 +168,10 @@ export const Navbar = () => {
 
   return (
     <div className="navbar-container">
-      <Link to="/" className="navbar-logo">STARKVEST</Link>
+      <Link to="/" className="navbar-logo"><b>StarkVest</b></Link>
       <div className="nav-links">
         <Link to="/about" className={isActive('/about') ? 'active' : ''}>About</Link>
+        <Link to="/markets" className={isActive('/markets') ? 'active' : ''}>Markets</Link>
         <Link to="/contact" className={isActive('/contact') ? 'active' : ''}>Contact</Link>
         {isAuthenticated && (
           <Link to="/portfolio" className={isActive('/portfolio') ? 'active' : ''}>Portfolio</Link>
