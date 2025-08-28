@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TradingViewWidget from './TradingViewWidget';
 
 function Markets() {
-  const [selectedIndex, setSelectedIndex] = useState('DJ:DJI');
+  const [selectedIndex, setSelectedIndex] = useState('BSE:SENSEX');
 
   const indexOptions = [
     { name: 'Bitcoin', symbol: 'BINANCE:BTCUSDT' },

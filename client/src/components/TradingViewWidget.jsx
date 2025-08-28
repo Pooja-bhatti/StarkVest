@@ -5,11 +5,13 @@ function TradingViewWidget({ symbol }) {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = process.env.REACT_APP_TRADINGVIEW_WIDGET;    
+    script.src = process.env.REACT_APP_TRADINGVIEW_WIDGET;
     script.type = 'text/javascript';
     script.async = true;
     script.innerHTML = JSON.stringify({
-      autosize: true,
+      autosize: false, // ❗ must be false to control size manually
+      width: '100%',
+      height: 600,     // ✅ height will now be respected
       symbol: symbol,
       interval: 'D',
       timezone: 'Etc/UTC',
@@ -33,8 +35,9 @@ function TradingViewWidget({ symbol }) {
       className="tradingview-widget-container"
       ref={container}
       style={{
-        height: '900px',  
         width: '100%',
+        maxWidth: '1400px',     // ✅ limits width for clean layout
+        margin: '0 auto',
         marginBottom: '2rem',
       }}
     >
