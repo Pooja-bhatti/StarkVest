@@ -150,8 +150,9 @@ export const Navbar = () => {
       return;
     }
     try {
+      console.log("API KEY:", API_KEY);
       const response = await axios.get(`https://stock.indianapi.in/stock?name=${encodeURIComponent(cleanedCompany)}`, {
-        headers: { 'x-api-key': API_KEY },
+        headers: { 'x-api-key': API_KEY},
       });
       if (response.data.error) {
         window.alert(response.data.error);
