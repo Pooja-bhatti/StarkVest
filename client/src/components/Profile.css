@@ -1,0 +1,196 @@
+/* ================================================
+   StarkVest — Profile Page Styles (Light Theme)
+   ================================================ */
+
+.sv-profile {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+  animation: fadeUpIn 0.5s var(--transition-base) forwards;
+}
+
+/* Profile Card */
+.sv-profile__card {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-profile__avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-profile__name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.02em;
+}
+
+.sv-profile__badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: var(--accent-muted);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+/* Stats */
+.sv-profile__stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.sv-profile__stat {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.sv-profile__stat:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.sv-profile__stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sv-profile__stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sv-profile__stat-value--profit { color: var(--color-success); }
+.sv-profile__stat-value--loss { color: var(--color-danger); }
+
+/* Fund Section */
+.sv-profile__fund-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-profile__fund-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.sv-profile__fund-section p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+}
+
+.sv-profile__fund-form {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.sv-profile__fund-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-fast);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.sv-profile__fund-input-wrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.sv-profile__fund-prefix {
+  padding: 0 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+}
+
+.sv-profile__fund-input-wrap input {
+  flex: 1;
+  padding: 0.65rem 0.85rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+}
+
+.sv-profile__fund-form button {
+  padding: 0.65rem 1.5rem;
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-profile__fund-form button:hover {
+  background: var(--text-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .sv-profile {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .sv-profile__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-profile__fund-form {
+    flex-direction: column;
+  }
+}

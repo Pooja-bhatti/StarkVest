@@ -1,0 +1,376 @@
+/* ================================================
+   StarkVest — Portfolio Page Styles (Light/Stripe Aesthetic)
+   ================================================ */
+
+.sv-portfolio {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+  animation: fadeUpIn 0.5s var(--transition-base) forwards;
+}
+
+/* Header */
+.sv-portfolio__header {
+  margin-bottom: var(--space-xl);
+}
+
+.sv-portfolio__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.sv-portfolio__subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* Summary Cards */
+.sv-portfolio__summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.sv-portfolio__summary-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-portfolio__summary-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sv-portfolio__summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.sv-portfolio__summary-value--profit { color: var(--color-success); }
+.sv-portfolio__summary-value--loss { color: var(--color-danger); }
+
+/* Empty State */
+.sv-portfolio__empty {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  background: var(--bg-surface);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-xl);
+}
+
+.sv-portfolio__empty svg {
+  margin: 0 auto var(--space-md);
+  color: var(--text-muted);
+}
+
+.sv-portfolio__empty h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.sv-portfolio__empty p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Stock Card */
+.sv-portfolio__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sv-stock-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-stock-card:hover {
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.sv-stock-card--expanded {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.sv-stock-card__main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.sv-stock-card__info {
+  min-width: 180px;
+}
+
+.sv-stock-card__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.sv-stock-card__qty {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Prices */
+.sv-stock-card__prices {
+  display: flex;
+  gap: var(--space-xl);
+  flex: 1;
+}
+
+.sv-stock-card__price-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.sv-stock-card__price-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sv-stock-card__price-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* P/L */
+.sv-stock-card__pl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  min-width: 120px;
+}
+
+.sv-stock-card__pl-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sv-stock-card__pl-value--profit { color: var(--color-success); }
+.sv-stock-card__pl-value--loss { color: var(--color-danger); }
+
+.sv-stock-card__pl-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.sv-stock-card__loading {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Trade Button */
+.sv-stock-card__trade-btn {
+  padding: 0.4rem 1.2rem;
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  font-weight: 500;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-stock-card__trade-btn:hover {
+  background: var(--text-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+.sv-stock-card__trade-btn--cancel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.sv-stock-card__trade-btn--cancel:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-subtle);
+  box-shadow: none;
+}
+
+/* Trade Panel */
+.sv-stock-card__trade-panel {
+  padding: var(--space-lg);
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  animation: tradePanelSlide 250ms var(--transition-base);
+}
+
+@keyframes tradePanelSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sv-stock-card__trade-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.sv-stock-card__trade-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sv-stock-card__trade-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.sv-stock-card__trade-field input,
+.sv-stock-card__trade-field select {
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  min-width: 140px;
+  transition: all var(--transition-fast);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.sv-stock-card__trade-field input:focus,
+.sv-stock-card__trade-field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-muted);
+}
+
+.sv-stock-card__trade-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0.4rem 0;
+}
+
+.sv-stock-card__trade-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.sv-stock-card__buy-btn,
+.sv-stock-card__sell-btn {
+  padding: 0.5rem 1.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  color: #FFFFFF;
+}
+
+.sv-stock-card__buy-btn {
+  background: var(--color-success);
+}
+
+.sv-stock-card__buy-btn:hover {
+  background: #047857; /* Emerald 700 */
+  box-shadow: var(--shadow-md);
+}
+
+.sv-stock-card__sell-btn {
+  background: var(--color-danger);
+}
+
+.sv-stock-card__sell-btn:hover {
+  background: #B91C1C; /* Red 700 */
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sv-portfolio {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .sv-portfolio__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .sv-stock-card__main {
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .sv-stock-card__info {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .sv-stock-card__prices {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .sv-stock-card__pl {
+    align-items: flex-start;
+    min-width: auto;
+  }
+
+  .sv-stock-card__trade-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sv-stock-card__trade-field input,
+  .sv-stock-card__trade-field select {
+    min-width: auto;
+    width: 100%;
+  }
+}

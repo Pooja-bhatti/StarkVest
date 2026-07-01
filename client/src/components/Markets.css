@@ -1,0 +1,106 @@
+/* ================================================
+   StarkVest — Markets Page Styles (Light Theme)
+   ================================================ */
+
+.sv-markets {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-xl);
+  min-height: calc(100vh - 72px);
+  animation: fadeUpIn 0.5s var(--transition-base) forwards;
+}
+
+.sv-markets__header {
+  margin-bottom: var(--space-xl);
+}
+
+.sv-markets__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.sv-markets__subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* Tabs */
+.sv-markets__tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.sv-markets__tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.sv-markets__tab:hover {
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.sv-markets__tab--active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--text-inverse);
+}
+
+.sv-markets__tab--active:hover {
+  background: var(--text-secondary);
+  color: var(--text-inverse);
+  opacity: 1;
+}
+
+.sv-markets__tab-icon {
+  font-size: 1rem;
+}
+
+/* Chart */
+.sv-markets__chart {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  overflow: hidden;
+  height: 600px;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 768px) {
+  .sv-markets {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .sv-markets__tabs {
+    gap: 0.35rem;
+  }
+
+  .sv-markets__tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .sv-markets__chart {
+    height: 450px;
+  }
+}

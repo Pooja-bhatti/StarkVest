@@ -1,214 +1,153 @@
+/* ================================================
+   StarkVest — About Page Styles (Light Theme)
+   ================================================ */
 
-:root {
-    --primary-color: #00E6B8; 
-    --secondary-color: #00ED64; 
-    --background-dark: #0A0A10; 
-    --text-light: #E0E0E0; 
-    --text-medium: #B0B0B0; 
-    --card-background: #1A1A2A; 
-    --border-color: rgba(255, 255, 255, 0.1); 
-    --shadow-color: rgba(0, 0, 0, 0.3);
+.sv-about {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl) var(--space-3xl);
+  animation: fadeUpIn 0.5s var(--transition-base) forwards;
 }
 
-
-.about-us-page {
-    background-color: var(--background-dark);
-    color: var(--text-light);
-    font-family: 'Inter', sans-serif;
-    padding: 6rem 2rem 4rem; 
-    margin: 0 auto; 
-    line-height: 1.6;
-    
+/* Hero */
+.sv-about__hero {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+  padding-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--border-default);
 }
 
-
-.about-hero {
-    text-align: center;
-    margin-bottom: 4rem;
-    padding: 2rem 0;
+.sv-about__tag {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.about-hero-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
+.sv-about__hero-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: var(--space-lg);
+  letter-spacing: -0.03em;
 }
 
-.about-hero-intro {
-    font-size: 1.3rem;
-    color: var(--text-medium);
-    max-width: 800px;
-    margin: 0 auto;
+.sv-about__hero-intro {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
-
-.about-section {
-    margin-bottom: 5rem;
-    background-color: var(--card-background);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 3.5rem 3rem;
-    text-align: center;
-    box-shadow: 0 5px 20px var(--shadow-color);
-    
+/* Section */
+.sv-about__section {
+  margin-bottom: var(--space-3xl);
 }
 
-.section-heading {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--text-light);
-    margin-bottom: 1.5rem;
-    text-align: center; 
-
-    
-    max-width: fit-content; 
-    margin-left: auto;     
-    margin-right: auto;   
-    position: relative; 
+.sv-about__section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
 }
 
-.section-heading::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -10px; 
-    width: 60px; 
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border-radius: 2px;
+.sv-about__section-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 800px;
 }
 
-.section-intro {
-    font-size: 1.15rem;
-    color: var(--text-medium);
-    max-width: 900px;
-    margin: 2.5rem auto 0; 
-    text-align: center;
+/* Advantage Grid */
+.sv-about__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-xl);
 }
 
-
-.advantage-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2.5rem;
-    margin-top: 3rem;
+.sv-about__card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
-.advantage-item {
-    background-color: rgba(255, 255, 255, 0.03); 
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    padding: 2rem;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.sv-about__card:hover {
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
-.advantage-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+.sv-about__card-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-muted);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  color: var(--accent);
 }
 
-.advantage-item h3 {
-    font-size: 1.6rem;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-weight: 600;
+.sv-about__card-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
-.advantage-item p {
-    font-size: 1rem;
-    color: var(--text-medium);
+.sv-about__card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.01em;
 }
 
-
-.commitment-section {
-    text-align: center;
-    padding: 4rem 3rem;
+.sv-about__card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
-
-
-@media (max-width: 1024px) {
-    .about-us-page {
-        padding: 5rem 1.5rem 3rem;
-    }
-
-    .about-hero-title {
-        font-size: 3rem;
-    }
-
-    .about-hero-intro {
-        font-size: 1.2rem;
-    }
-
-    .section-heading {
-        font-size: 2.2rem;
-    }
-
-    .about-section {
-        padding: 3rem 2rem;
-        margin-bottom: 4rem;
-    }
+/* Commitment */
+.sv-about__commitment {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-3xl) var(--space-xl);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
+.sv-about__commitment .sv-about__section-heading {
+  text-align: center;
+}
+
+.sv-about__commitment .sv-about__section-text {
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .about-us-page {
-        padding: 4rem 1rem 2rem;
-    }
+  .sv-about {
+    padding: var(--space-2xl) var(--space-md);
+  }
 
-    .about-hero-title {
-        font-size: 2.5rem;
-    }
-
-    .about-hero-intro {
-        font-size: 1.1rem;
-    }
-
-    .section-heading {
-        font-size: 1.8rem;
-    }
-
-    .section-heading::after {
-        width: 50px;
-        bottom: -8px;
-    }
-
-    .section-intro {
-        font-size: 1rem;
-    }
-
-    .advantage-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .advantage-item h3 {
-        font-size: 1.4rem;
-    }
-
-    .advantage-item p {
-        font-size: 0.95rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .about-hero-title {
-        font-size: 2rem;
-    }
-
-    .about-hero-intro {
-        font-size: 0.95rem;
-    }
-
-    .section-heading {
-        font-size: 1.6rem;
-    }
-
-    .about-section {
-        padding: 2rem 1.5rem;
-    }
+  .sv-about__grid {
+    grid-template-columns: 1fr;
+  }
 }
