@@ -98,6 +98,13 @@ export const Home = () => {
     });
   };
 
+  const getGreeting = (date) => {
+    const hours = date.getHours();
+    if (hours < 12) return 'Good Morning';
+    if (hours < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   // Mock Data for new dashboard sections
   const mockActivity = [
     { id: 1, type: 'buy', ticker: 'RELIANCE', amount: '₹12,450', time: '2 hours ago' },
@@ -113,7 +120,7 @@ export const Home = () => {
         {/* Welcome Header */}
         <header className="sv-dashboard__header">
           <div className="sv-dashboard__welcome">
-            <h1 className="sv-dashboard__name">Good afternoon, {displayName || 'Trader'}</h1>
+            <h1 className="sv-dashboard__name">{getGreeting(currentTime)}, {displayName || 'Trader'}</h1>
             <p className="sv-dashboard__greeting">Here's your portfolio overview for {formatDate(currentTime)}.</p>
           </div>
           <div className="sv-dashboard__actions">
