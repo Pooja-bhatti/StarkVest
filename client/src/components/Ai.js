@@ -3,137 +3,210 @@ import axios from 'axios';
 import './Ai.css';
 
 export const Ai = () => {
-  const [response, setResponse] = useState('');
-  const [budget, setBudget] = useState('');
+  const [stockName, setStockName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeAction, setActiveAction] = useState(null);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
 
-  const handleRequest = async (actionType) => {
+  const handleAnalyze = async (e) => {
+    e.preventDefault();
+    if (!stockName.trim()) return;
+
     setLoading(true);
-    setResponse('');
-    setActiveAction(actionType);
-
-    const data = { action: actionType };
-    if (actionType === 'buy') data.budget = Number(budget);
+    setResult(null);
+    setError('');
 
     try {
-      const result = await axios.post('/aisuggest', data);
-      setResponse(result.data.answer || 'No response');
+      const res = await axios.post('/aisuggest', { stockName: stockName.trim() });
+      setResult(res.data.answer);
     } catch (err) {
-      console.error('Request failed:', err);
-      setResponse('Something went wrong. Please try again.');
+      console.error('Analysis failed:', err);
+      setError(err.response?.data?.details || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const disabledBuy = !budget || Number(budget) <= 0 || loading;
+  const getActionClass = (action) => {
+    if (!action) return '';
+    const a = action.toUpperCase();
+    if (a === 'BUY') return 'action-buy';
+    if (a === 'SELL') return 'action-sell';
+    return 'action-hold';
+  };
 
-  const actions = [
-    {
-      key: 'buy',
-      title: 'Best Stocks to Buy',
-      description: 'AI suggests top stocks for your budget',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      ),
-      disabled: disabledBuy,
-    },
-    {
-      key: 'sell',
-      title: 'Stocks to Sell',
-      description: 'Review portfolio for sell opportunities',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-      ),
-      disabled: loading,
-    },
-    {
-      key: 'sectors',
-      title: 'Top Sectors',
-      description: 'Discover the best sectors to invest in',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      ),
-      disabled: loading,
-    },
-  ];
+  const getScoreColor = (score) => {
+    if (score >= 75) return 'score-high';
+    if (score >= 45) return 'score-mid';
+    return 'score-low';
+  };
+
+  const getRiskClass = (risk) => {
+    if (!risk) return '';
+    const r = risk.toLowerCase();
+    if (r === 'high') return 'risk-high';
+    if (r === 'low') return 'risk-low';
+    return 'risk-medium';
+  };
 
   return (
     <div className="sv-ai" id="ai-page">
       <header className="sv-ai__header">
-        <h1 className="sv-ai__title">AI Insights</h1>
-        <p className="sv-ai__subtitle">Get AI-powered trading suggestions for your portfolio</p>
+        <h1 className="sv-ai__title">AI Stock Advisor</h1>
+        <p className="sv-ai__subtitle">Ask about any stock — get an instant BUY, HOLD, or SELL recommendation backed by market insights</p>
       </header>
 
-      {/* Budget Input */}
-      <div className="sv-ai__budget-card">
-        <div className="sv-ai__budget-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="18" height="18">
-            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      {/* Search Form */}
+      <form onSubmit={handleAnalyze} className="sv-ai__search-form">
+        <div className="sv-ai__search-wrap">
+          <svg className="sv-ai__search-icon" viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"/>
           </svg>
-          Investment Amount
-        </div>
-        <div className="sv-ai__budget-input-wrap">
-          <span className="sv-ai__budget-prefix">₹</span>
           <input
-            type="number"
-            value={budget}
-            min="0"
-            onChange={(e) => setBudget(e.target.value)}
-            placeholder="50,000"
-            id="ai-budget-input"
+            type="text"
+            value={stockName}
+            onChange={(e) => setStockName(e.target.value)}
+            placeholder="Enter a company name... e.g. Reliance, TCS, HDFC Bank"
+            disabled={loading}
+            autoFocus
+            id="ai-stock-input"
           />
         </div>
-        <p className="sv-ai__budget-hint">Required for "Best Stocks to Buy" suggestions</p>
-      </div>
+        <button type="submit" disabled={loading || !stockName.trim()} className="sv-ai__analyze-btn">
+          {loading ? (
+            <>
+              <span className="sv-ai__btn-spinner"></span>
+              Analyzing...
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"/>
+              </svg>
+              Analyze Stock
+            </>
+          )}
+        </button>
+      </form>
 
-      {/* Action Cards */}
-      <div className="sv-ai__actions">
-        {actions.map(action => (
-          <button
-            key={action.key}
-            className={`sv-ai__action-card ${activeAction === action.key && loading ? 'sv-ai__action-card--loading' : ''}`}
-            onClick={() => handleRequest(action.key)}
-            disabled={action.disabled}
-          >
-            <div className="sv-ai__action-icon">{action.icon}</div>
-            <div className="sv-ai__action-text">
-              <h3>{action.title}</h3>
-              <p>{action.description}</p>
-            </div>
-            <svg className="sv-ai__action-arrow" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd"/>
-            </svg>
-          </button>
-        ))}
-      </div>
-
-      {/* Response */}
-      {loading && (
-        <div className="sv-ai__response sv-ai__response--loading">
-          <div className="sv-ai__skeleton">
-            <div className="sv-ai__skeleton-line sv-ai__skeleton-line--full"></div>
-            <div className="sv-ai__skeleton-line sv-ai__skeleton-line--3q"></div>
-            <div className="sv-ai__skeleton-line sv-ai__skeleton-line--half"></div>
-            <div className="sv-ai__skeleton-line sv-ai__skeleton-line--full"></div>
-            <div className="sv-ai__skeleton-line sv-ai__skeleton-line--3q"></div>
-          </div>
+      {/* Error State */}
+      {error && (
+        <div className="sv-ai__error">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+          </svg>
+          <span>{error}</span>
         </div>
       )}
 
-      {!loading && response && (
-        <div className="sv-ai__response">
-          <div className="sv-ai__response-header">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="18" height="18">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            AI Suggestion
+      {/* Loading State */}
+      {loading && (
+        <div className="sv-ai__loading">
+          <div className="sv-ai__spinner"></div>
+          <h3>Analyzing {stockName}...</h3>
+          <p>Checking market data, recent news, and financial indicators...</p>
+        </div>
+      )}
+
+      {/* Result Card */}
+      {result && !loading && (
+        <div className="sv-ai__result">
+
+          {/* Header: Company + Action Badge */}
+          <div className="sv-ai__result-header">
+            <div className="sv-ai__result-company">
+              <h2>{result.companyName || stockName}</h2>
+              <div className="sv-ai__result-meta">
+                {result.ticker && <span className="sv-ai__ticker">{result.ticker}</span>}
+                {result.sector && <span className="sv-ai__sector-tag">{result.sector}</span>}
+                {result.riskLevel && (
+                  <span className={`sv-ai__risk-tag ${getRiskClass(result.riskLevel)}`}>
+                    {result.riskLevel} Risk
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className={`sv-ai__action-badge ${getActionClass(result.action)}`}>
+              {result.action}
+            </div>
           </div>
-          <pre className="sv-ai__response-content">{response}</pre>
+
+          {/* Confidence Score */}
+          <div className="sv-ai__confidence">
+            <div className="sv-ai__confidence-header">
+              <span className="sv-ai__confidence-label">AI Confidence</span>
+              <span className={`sv-ai__confidence-value ${getScoreColor(result.confidenceScore)}`}>
+                {result.confidenceScore}%
+              </span>
+            </div>
+            <div className="sv-ai__confidence-bar">
+              <div
+                className={`sv-ai__confidence-fill ${getScoreColor(result.confidenceScore)}`}
+                style={{ width: `${result.confidenceScore}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          {result.summary && (
+            <div className="sv-ai__summary">
+              <p>{result.summary}</p>
+            </div>
+          )}
+
+          {/* Bull & Bear Cases */}
+          <div className="sv-ai__cases">
+            {result.bullCase && (
+              <div className="sv-ai__case sv-ai__case--bull">
+                <h4>
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd"/>
+                  </svg>
+                  Bull Case
+                </h4>
+                <p>{result.bullCase}</p>
+              </div>
+            )}
+            {result.bearCase && (
+              <div className="sv-ai__case sv-ai__case--bear">
+                <h4>
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fillRule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clipRule="evenodd"/>
+                  </svg>
+                  Bear Case
+                </h4>
+                <p>{result.bearCase}</p>
+              </div>
+            )}
+          </div>
+
+          {/* News Insights */}
+          {result.newsInsights && result.newsInsights.length > 0 && (
+            <div className="sv-ai__news">
+              <h4>
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                  <path fillRule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clipRule="evenodd"/>
+                  <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V7z"/>
+                </svg>
+                Recent News & Catalysts
+              </h4>
+              <ul>
+                {result.newsInsights.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Disclaimer */}
           <div className="sv-ai__disclaimer">
-            ⚠️ These are AI-generated suggestions. Always do your own research before making financial decisions.
+            ⚠️ This is an AI-generated suggestion for educational purposes only. Always do your own research before making investment decisions.
           </div>
+
+          {/* Search Again */}
+          <button className="sv-ai__again-btn" onClick={() => { setResult(null); setStockName(''); }}>
+            ← Analyze Another Stock
+          </button>
         </div>
       )}
     </div>

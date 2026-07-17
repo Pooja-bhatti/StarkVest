@@ -1,0 +1,156 @@
+# StarkVest Project Analysis
+
+StarkVest is a web-based **virtual paper trading platform** designed for Indian equities, ETFs, global indices, cryptocurrency, and gold. It provides a risk-free environment for users to build portfolios, practice trading, track global markets, and leverage AI-powered investment advice.
+
+---
+
+## 🏛️ System Architecture
+
+The project is structured as a full-stack JavaScript application split into three main parts:
+1. **Frontend Client (`client/`)**: A React application using Vanilla CSS and React Router, integrated with Auth0 for user authentication, TradingView for charts, and communicating with the backend.
+2. **Backend Server (`server/`)**: An Express.js REST API using Mongoose (MongoDB) for persistent data storage, JWT for session token validation, and integrating with external APIs.
+3. **Legacy/Static Mockups (Root & `signin/`)**: Standard HTML/CSS mockups (`index.html`, `login.html`, `signin.html`) that are separate from the main React-based client.
+
+```mermaid
+graph TD
+    subgraph Client [React Frontend - Port 3000]
+        C_App[App.js] --> C_Navbar[Navbar.js]
+        C_App --> C_Home[Home.js]
+        C_App --> C_Markets[Markets.js]
+        C_App --> C_Portfolio[Portfolio.js]
+        C_App --> C_Details[Details.js]
+        C_App --> C_Ai[Ai.js]
+        C_App --> C_Profile[Profile.js]
+    end
+
+    subgraph Server [Express Backend - Port 5000]
+        S_Server[server.js] --> S_Auth[isloggedin.js Middleware]
+        S_Server --> S_Order[order.js Time/Holiday Check]
+        S_Server --> S_User[user.js Model]
+        S_Server --> S_Stocks[stocks.js Model]
+    end
+
+    subgraph External [External APIs]
+        Ext_Auth0[Auth0 Authentication]
+        Ext_IndianAPI[IndianAPI - Live Stock Prices]
+        Ext_Gemini[Gemini 2.0 Flash - AI Suggestions]
+        Ext_TradingView[TradingView Chart Embedding]
+    end
+
+    C_Navbar <-->|Auth| Ext_Auth0
+    C_Markets <-->|Charts| Ext_TradingView
+    C_Portfolio <-->|Live Stock Search| Ext_IndianAPI
+    C_Details <-->|Live Stock Search| Ext_IndianAPI
+    
+    C_App <-->|REST Requests / Cookies| S_Server
+    S_Server <-->|Gemini API Key| Ext_Gemini
+    S_Server <-->|MongoDB| Mongo[(Local/Atlas MongoDB)]
+```
+
+---
+
+## 💾 Database Schema
+
+The database relies on MongoDB (via Mongoose) and consists of two primary collections.
+
+### 1. User Schema ([user.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/models/user.js))
+Represents a user account, tracking their personal info, virtual cash balance, and overall performance statistics.
+* **`name`**: `String` (Required)
+* **`email`**: `String` (Required)
+* **`current_funds`**: `Number` (Default: `₹1,00,000` virtual funds)
+* **`stocks`**: `ObjectId` (Ref: `Portfolio` model)
+* **`realisedPL`**: `Number` (Default: `0` - Tracks total booked profit/loss from sales)
+* **`netInvestment`**: `Number` (Default: `0` - Tracks total active investment)
+
+### 2. Portfolio & Stock Schema ([stocks.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/models/stocks.js))
+Tracks the stock holdings for each user.
+* **`user`**: `ObjectId` (Ref: `user` model, Required)
+* **`stocks`**: Array of sub-documents:
+  * **`company`**: `String` (Required)
+  * **`average_price`**: `Number` (Required)
+  * **`quantity`**: `Number` (Required)
+
+---
+
+## ⚡ Backend API Endpoints ([server.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/server.js))
+
+The server listens on **port 5000** and serves the following REST endpoints:
+
+### Authentication
+* **`POST /signin`**: Authenticates or registers a user. If new, it initializes a portfolio. Generates a JWT token stored in cookie `token`.
+* **`GET /logout`**: Clears the authentication token cookie. *(Protected by `isloggedin`)*
+
+### Funds Management
+* **`POST /editfunds`**: Directly adjusts the user's virtual balance (`current_funds`). *(Protected by `isloggedin`)*
+
+### Order & Trading Operations
+* **`POST /orderbuy`**: Executes a paper BUY order. Checks if funds are sufficient, deducts funds, updates the user's portfolio stock holdings (calculates weighted average price), and increments net investment. *(Protected by `isloggedin` and `order` market check)*
+* **`POST /ordersell`**: Executes a paper SELL order. Checks if the user owns enough shares of the stock, removes/reduces the stock from portfolio, credits the sale value to funds, and books the profit/loss to `realisedPL`. *(Protected by `isloggedin` and `order` market check)*
+
+### Portfolio & Stats
+* **`GET /getstocks`**: Retrieves all stock holdings inside the user's active portfolio. *(Protected by `isloggedin`)*
+* **`GET /userdata`**: Retrieves the user's statistical indicators (`netInvestment`, `realisedPL`). *(Protected by `isloggedin`)*
+
+### AI Integration
+* **`POST /aisuggest`**: Accepts `action` ('buy' | 'sell' | 'sectors') and `budget`. Sends detailed prompts to **Gemini 2.0 Flash** to output clean recommendations formatted as tabular text. For sells, it passes a text summary of the user's current holdings to the AI. *(Protected by `isloggedin`)*
+
+---
+
+## 🛡️ Middlewares
+
+* **[isloggedin.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/middleware/isloggedin.js)**: Verifies the JWT cookie (`token`) using the key stored in `process.env.JWT`. Fetches user information from MongoDB and attaches the user object to `req.user`.
+* **[order.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/middleware/order.js)**: Enforces real-world Indian Stock Market constraints (NSE Rules) on buy and sell actions:
+  * **Weekend Check**: Rejects orders on Saturdays and Sundays.
+  * **Holiday Check**: Rejects orders on a hardcoded list of NSE holidays for 2026.
+  * **Market Hours Check**: Rejects orders placed outside standard hours **09:15 to 15:30 IST**.
+
+---
+
+## 🎨 Frontend React Client
+
+The frontend client resides in `client/` and communicates with the backend API via relative URLs (proxied to `http://localhost:5000` via [package.json](file:///c:/Users/DELL/Desktop/StarkVest-main/client/package.json)).
+
+### Main Components:
+1. **[App.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/App.js)**: Outlines routing using `react-router-dom` (`/`, `/markets`, `/portfolio`, `/stock-details`, `/profile`, `/ai`, `/about`, `/contact`).
+2. **[Home.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Home.js)**:
+   * *Unauthenticated*: Shows a landing page promoting paper trading and virtual funds.
+   * *Authenticated*: Renders the user Dashboard with KPI metrics (Portfolio Value, Realised P/L, Funds), mock activity feed, mock financial news, and navigation links.
+3. **[Navbar.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Navbar.js)**: Controls top navigation, Auth0 logins/logouts, displays virtual wallet balances, allows quick fund updates, and manages a search bar with auto-suggestions loading from `companyList.json`. Clicking a search result navigates to `/stock-details`.
+4. **[Details.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Details.js)**: Renders live NSE/BSE stock details, P/E, EPS, Market Cap, 52-week high/low progress bar, and a buy/sell trade panel.
+5. **[Portfolio.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Portfolio.js)**: Displays portfolio statistics (Unrealised P/L calculated using live prices, Holdings list). Users can trade (buy/sell) shares directly from individual stock cards.
+6. **[Ai.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Ai.js)**: Front-end for the `/aisuggest` backend. Users input budgets and query the AI Assistant.
+7. **[Markets.js](file:///c:/Users/DELL/Desktop/StarkVest-main/client/src/components/Markets.js)**: Houses global asset tabs (Sensex, Nasdaq, Bitcoin, Gold) using a TradingView Advanced Chart widget.
+
+---
+
+## 🔍 Critical Bugs & Potential Refactors
+
+### 1. Backend Crash Bug on Authentication Failure
+In [server/middleware/isloggedin.js#L14](file:///c:/Users/DELL/Desktop/StarkVest-main/server/middleware/isloggedin.js#L14):
+```javascript
+if(!user){
+    window.alert('please login first'); // ❌ CRITICAL BUG: window is not defined in Node.js!
+    return res.status(500).json({message:"You must login first"});
+}
+```
+* **Impact**: If a request includes a valid token signature but the matching user is missing from the database, the backend attempts to call `window.alert`, throwing a `ReferenceError` and crashing the server process.
+* **Fix**: Remove `window.alert(...)` entirely from backend middleware.
+
+### 2. Client-side Environment Variable Exposure
+In [client/.env](file:///c:/Users/DELL/Desktop/StarkVest-main/client/.env):
+```env
+REACT_APP_STOCK_API_KEY=sk-live-wF2YO0Z3IF5Slq8dQ3n6YI0eutcyPWrVdPmPTWdq
+REACT_APP_GEMINI_API_KEY=AIzaSyCLZgeIr8ERhRaDCaJo4MFZ0dYwxR4sS40
+```
+* **Impact**: Because these variables are prefixed with `REACT_APP_`, they are bundled into the static React build code. Anyone visiting the website can extract the Google Gemini API key and the IndianAPI key.
+* **Fix**: Move the stock API call to the backend server and store API keys exclusively in the server's `.env` file, hiding them from the client browser.
+
+### 3. Lack of Database Transactions
+In [server/server.js:orderbuy](file:///c:/Users/DELL/Desktop/StarkVest-main/server/server.js#L68) and [ordersell](file:///c:/Users/DELL/Desktop/StarkVest-main/server/server.js#L141):
+* **Impact**: Deducting user funds and saving portfolio holdings are done via two separate, non-atomic mongoose calls (`myuser.save()` and `portfolio.save()`). If one fails, it creates an inconsistent state (e.g. funds are deducted but stocks are not credited).
+* **Fix**: Introduce MongoDB Sessions and Transactions for order handling.
+
+### 4. NSE Holidays List Maintenance
+In [server/middleware/order.js](file:///c:/Users/DELL/Desktop/StarkVest-main/server/middleware/order.js):
+* **Impact**: The list of holidays is statically defined for the year 2026. This means the middleware will reject transactions on those specific dates in perpetuity, or allow transactions on holidays of subsequent years.
+* **Fix**: Fetch current-year market holidays dynamically from an external endpoint or a JSON configuration folder.
