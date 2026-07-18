@@ -5,12 +5,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import axios from 'axios';
+import { UserProvider } from './context/UserContext';
+import { Auth0Provider } from '@auth0/auth0-react';
 
 axios.defaults.baseURL = 'https://starkvest-ieb4.onrender.com';
 axios.defaults.withCredentials = true;
 
-import { UserProvider } from './context/UserContext';
-import { Auth0Provider } from '@auth0/auth0-react';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
