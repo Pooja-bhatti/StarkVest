@@ -17,7 +17,17 @@ const cors = require('cors');
 
 const app=express()
 
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = ['https://starkvest-1.onrender.com', 'http://localhost:3000', 'http://localhost:5000'];
+app.use(cors({ 
+    origin: function(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }, 
+    credentials: true 
+}));
 app.use(express.urlencoded({extended:true}))
 app.use(cooki_parser());
 app.use(express.json())
