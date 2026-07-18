@@ -162,6 +162,7 @@ export const Navbar = () => {
     try {
       const response = await axios.get(`https://stock.indianapi.in/stock?name=${encodeURIComponent(cleanedCompany)}`, {
         headers: { 'x-api-key': API_KEY},
+        withCredentials: false
       });
       if (response.data.error) {
         window.alert(response.data.error);

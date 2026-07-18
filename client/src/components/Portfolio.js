@@ -60,7 +60,8 @@ export const Portfolio = () => {
         `https://stock.indianapi.in/stock?name=${encodeURIComponent(cleaned)}`,
         {
           headers: { 'x-api-key': API_KEY },
-          signal: controller.signal
+          signal: controller.signal,
+          withCredentials: false
         }
       );
       if (!res.data.error && isMounted.current) {

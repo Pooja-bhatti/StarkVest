@@ -12,10 +12,12 @@ const path = require('path');
 const { askAi } = require('./services/openRouter.service.js');
 
 const order=require('./middleware/order');
+const cors = require('cors');
 
 
 const app=express()
 
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.urlencoded({extended:true}))
 app.use(cooki_parser());
 app.use(express.json())
@@ -33,12 +35,12 @@ app.post('/signin', async (req, res) => {
             await myuser.save();
             console.log(myuser)
             const token = get_token(myuser);
-            res.status(200).cookie('token', token).json({ message: "User verified",name,fund:myuser.current_funds});
+            res.status(200).cookie('token', token, { sameSite: 'none', secure: true }).json({ message: "User verified",name,fund:myuser.current_funds});
         }
         else{
             // console.log(myuser)
             const token = get_token(myuser);
-            res.status(200).cookie('token', token).json({ message: "User verified",name:myuser.name,fund:myuser.current_funds});
+            res.status(200).cookie('token', token, { sameSite: 'none', secure: true }).json({ message: "User verified",name:myuser.name,fund:myuser.current_funds});
         }
     } catch (err) {
         console.error(err);
@@ -47,7 +49,7 @@ app.post('/signin', async (req, res) => {
 });
 
 app.get('/logout', isloggedin, (req, res) => {
-  res.clearCookie('token'); 
+  res.clearCookie('token', { sameSite: 'none', secure: true }); 
   return res.status(200).send('Logged out successfully');
 });
 
