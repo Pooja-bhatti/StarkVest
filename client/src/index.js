@@ -15,17 +15,17 @@ axios.defaults.withCredentials = true;
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
-  <UserProvider>
-    <Auth0Provider
-    domain="dev-bva7lpjmsvi685n6.us.auth0.com"
-    clientId="0n5mQoUNRQLPvutpuluGaQgNFk9EfFoU"
-    authorizationParams={{
-      redirect_uri: window.location.origin
-    }}
-  >
-    <App />
-  </Auth0Provider>
-  </UserProvider>
+    <UserProvider>
+      <Auth0Provider
+        domain="dev-yo8mohx34jfe415e.us.auth0.com"
+        clientId="2UYwL0J4mwygHHJk9VpBulV63AexUbOz"
+        authorizationParams={{
+          redirect_uri: window.location.origin
+        }}
+      >
+        <App />
+      </Auth0Provider>
+    </UserProvider>
   </BrowserRouter>
 );
 
